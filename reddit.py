@@ -1,13 +1,18 @@
 ''' This module fetches latest posts periodically and tells us whether a post is getting popular '''
 from logger import Logger
+from ttldict import TTLOrderedDict
+import json
 import requests
 
-URL = 'https://reddit.com/r/nba.json'
+BASE_URL = 'https://reddit.com/r/nba'
+URL = BASE_URL + '.json'
+UPVOTE_THRESHOLD = 1500
+TTL = 60 * 60 * 24 * 3
 
 class Reddit(object):
     ''' Class to define reddit instance '''
     def __init__(self):
-        self.posts = []
+        self.posts = TTLOrderedDict(default_ttl=TTL)
         self.logger = Logger()
 
     def fetch_latest_posts(self):
@@ -22,9 +27,30 @@ class Reddit(object):
         except Exception as general_exception:
             self.logger.log.error('Exception on {0}'.format(general_exception.message))
         
-        self.logger.log.info('massaging')
-        self.logger.log.info(len(posts))
         for p in posts:
-            self.logger.log.info('Posting')
             post = p.get('data', {})
-            self.posts.append({ 'title': post.get('title', ''), 'id': post.get('id', ''), 'num_comments': post.get('num_comments', 0), 'up_votes': post.get('ups', 0)})
+            id = post.get('id', None)
+            if not id:
+                self.logger.log.info('Post with no id found: {0}'.format(json.dumps(post)))
+                continue
+            self.posts[id] = {
+                'title': post.get('title', ''),
+                'id': post.get('id', ''),
+                'num_comments': post.get('num_comments', 0),
+                'up_votes': post.get('ups', 0),
+                'link': post.get('permalink', '')
+            }
+
+    def flush_posts(self):
+        ''' Flush posts '''
+        self.posts = {}
+
+    @staticmethod
+    def is_post_getting_hot(post):
+        ''' Given an old post and a new post, determine if the post is getting popular in rNBA '''
+        upvotes = post.get('ups', 0)
+        if upvotes > UPVOTE_THRESHOLD:
+            title = post.get('title', '')
+            link = post.get('link', '')
+            votes = post.get('upvotes')
+            return {}

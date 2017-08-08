@@ -4,7 +4,7 @@ feedparser==5.2.1
 idna==2.5
 pync==1.6.1
 python-dateutil==2.6.1
-redis==2.10.5
 requests==2.18.2
 six==1.10.0
+ttldict==0.3.0
 urllib3==1.22
