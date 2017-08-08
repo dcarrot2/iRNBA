@@ -18,9 +18,9 @@ class Reddit(object):
         try:
             posts = nba_front_page.json()['data']['children']
         except KeyError as exception:
-            self.logger.log.info('Key error on {0}'.format(exception.message))
-        except Exception:
-            pass
+            self.logger.log.error('Key error on {0}'.format(exception.message))
+        except Exception as general_exception:
+            self.logger.log.error('Exception on {0}'.format(general_exception.message))
         
         self.logger.log.info('massaging')
         self.logger.log.info(len(posts))
@@ -28,5 +28,3 @@ class Reddit(object):
             self.logger.log.info('Posting')
             post = p.get('data', {})
             self.posts.append({ 'title': post.get('title', ''), 'id': post.get('id', ''), 'num_comments': post.get('num_comments', 0), 'up_votes': post.get('ups', 0)})
-
-        print nba_front_page.json()['data'].keys()

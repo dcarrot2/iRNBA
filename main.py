@@ -7,6 +7,6 @@ def main():
 
     reddit = Reddit()
     reddit.fetch_latest_posts()
-    print reddit.posts
+    print(reddit.posts)
 
 main()
