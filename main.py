@@ -5,15 +5,22 @@ from reddit import Reddit
 
 import time
 
-FIVE_MINUTES = 60 * 60 * 5
+FIVE_MINUTES = 60 * 5
 def main():
     ''' Instantiates reddit and notification notifier '''
     reddit = Reddit()
     while True:
         reddit.fetch_latest_posts()
-
-
+        for notification in reddit.notifications:
+            if notification:
+                Notifier.notify(
+                    '{0}'.format(
+                        notification['title']
+                    ),
+                    open=notification['link'],
+                    title='iRNBA'
+                )
+                time.sleep(5)
         time.sleep(FIVE_MINUTES)
-    Notifier.notify('You have {0} new posts!'.format(len(reddit.posts)), title='iRNBA')
 
 main()
