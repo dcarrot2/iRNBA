@@ -22,6 +22,7 @@ class Reddit(object):
         self.logger.log.info('Fetching nba front page')
         nba_front_page = requests.get(URL, headers = {'User-agent' : 'irnba 0.0.1'})
         posts = []
+        keys = ['title', 'id', 'ups', 'permalink']
         try:
             posts = nba_front_page.json()['data']['children']
         except KeyError as exception:
@@ -35,20 +36,14 @@ class Reddit(object):
             if not id:
                 self.logger.log.info('Post with no id found: {0}'.format(json.dumps(post)))
                 continue
-            self.posts[id] = {
-                'title': post.get('title', ''),
-                'id': post.get('id', ''),
-                'num_comments': post.get('num_comments', 0),
-                'up_votes': post.get('ups', 0),
-                'link': post.get('permalink', '')
-            }
+            self.posts[id] = {key: post.get(key, '') for key in keys}
             self.notifications.append(
                 self.is_post_getting_hot(self.posts[id])
             )
 
     def is_post_getting_hot(self, post):
         ''' Given an old post and a new post, determine if the post is getting popular in rNBA '''
-        upvotes = post.get('up_votes', 0)
+        upvotes = post.get('ups', 0)
         if upvotes > UPVOTE_THRESHOLD and not self.posts[post['id']].get('marked', False):
             title = post.get('title', '')
             link = post.get('link', '')
