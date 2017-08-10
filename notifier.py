@@ -9,8 +9,6 @@ class Notifier(object):
     ''' Class to determine what notifier to use '''
     def __init__(self):
         self.notifier = None
-        print(platform)
-        print(platform)
         if platform == 'linux':
             self.notifier = self.linux_notifier
         else:
