@@ -15,18 +15,18 @@ class Notifier(object):
             self.notifier = self.mac_notifier
 
     @staticmethod
-    def linux_notifier(*args):
-        subprocess.Popen(['notify-send', args[0], args[1]])
+    def linux_notifier(**kwargs):
+        subprocess.Popen(['notify-send', kwargs.get('title', ''), kwargs.get('message')])
         return
 
     @staticmethod
-    def mac_notifier(title, message, link):
+    def mac_notifier(*kwargs):
         Notifier.notify(
-            message,
-            open=link,
-            title=title
+            kwargs.get('message', ''),
+            open=kwargs.get('link', ''),
+            title=kwargs.get('title', '')
         )
         return
 
     def send_notification(self, **kwargs):
-        self.notifier(*(kwargs.values()))
+        self.notifier(**kwargs)
